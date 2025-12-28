@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNV Leave & Attendance | Admin Portal</title>
+    <style>
+        :root {
+            --primary: #0D47A1;       /* JNV Blue */
+            --primary-dark: #002171;
+            --secondary: #5472d3;
+            --bg-body: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --border: #E5E7EB;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo-area {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-area h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-area span {
+            font-size: 12px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            padding: 24px 16px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-card);
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .header-title p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-container {
+            padding: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 8px 0;
+            color: var(--text-main);
+        }
+
+        .stat-meta {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+        .text-primary { color: var(--primary); }
+
+        /* Split View */
+        .split-view {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover { background-color: var(--primary-dark); }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover { background-color: var(--bg-body); }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background-color: #F9FAFB;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .bg-success-light { background-color: #D1FAE5; color: #065F46; }
+        .bg-warning-light { background-color: #FEF3C7; color: #92400E; }
+        .bg-danger-light { background-color: #FEE2E2; color: #991B1B; }
+
+        /* Quick Actions List */
+        .action-list {
+            list-style: none;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .action-item:last-child { border-bottom: none; }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #EFF6FF;
+            color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>JNV APP</h2>
+            <span>Admin Portal</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">👥</span> Students
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">📅</span> Attendance
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">📨</span> Leaves
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">🏠</span> Hostels
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">⚙️</span> Settings
+            </a>
+        </nav>
+        <div style="padding: 24px; font-size: 12px; opacity: 0.6;">
+            v1.0.0 (Offline Mode)
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="header-title">
+                <h1>Principal's Dashboard</h1>
+                <p>JNV Kamrup Metro • 28 Dec 2025</p>
+            </div>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; font-size: 14px;">Dr. R. Sharma</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Principal</div>
+                </div>
+                <div class="avatar">RS</div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            
+            <div class="stats-grid">
+                <div class="card">
+                    <div class="stat-label">Total Strength</div>
+                    <div class="stat-value text-primary">542</div>
+                    <div class="stat-meta text-muted">Boys: 322 | Girls: 220</div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-label">Present Today</div>
+                    <div class="stat-value text-success">512</div>
+                    <div class="stat-meta text-success">
+                        <span>▲ 94.4% Attendance</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-label">On Leave</div>
+                    <div class="stat-value text-warning">24</div>
+                    <div class="stat-meta text-muted">
+                        6 Returning Today
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-value text-danger">8</div>
+                    <div class="stat-meta text-danger">
+                        Action Required
+                    </div>
+                </div>
+            </div>
+
+            <div class="split-view">
+                
+                <div class="card">
+                    <div class="section-header">
+                        <h3>Attendance by House</h3>
+                        <button class="btn btn-outline">View Full Report</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>House Name</th>
+                                <th>Total</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: 600; color: var(--primary);">Nilgiri</td>
+                                <td>135</td>
+                                <td>130</td>
+                                <td>5</td>
+                                <td><span class="status-badge bg-success-light">96% Good</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: var(--success);">Arawali</td>
+                                <td>140</td>
+                                <td>138</td>
+                                <td>2</td>
+                                <td><span class="status-badge bg-success-light">98% Good</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: #b91c1c;">Shivalik</td>
+                                <td>132</td>
+                                <td>115</td>
+                                <td>17</td>
+                                <td><span class="status-badge bg-danger-light">Check Required</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: var(--warning);">Udaygiri</td>
+                                <td>135</td>
+                                <td>129</td>
+                                <td>6</td>
+                                <td><span class="status-badge bg-warning-light">Average</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <h3>Pending Approvals</h3>
+                    </div>
+                    <ul class="action-list">
+                        <li class="action-item">
+                            <div class="action-icon">💊</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px;">Rahul Kumar (Cls 9)</div>
+                                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Medical Leave - 3 Days</div>
+                                <div style="margin-top: 8px;">
+                                    <button class="btn btn-primary" style="font-size: 11px; padding: 4px 8px;">Approve</button>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="action-item">
+                            <div class="action-icon">🏠</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px;">Amit Singh (Cls 11)</div>
+                                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Home Visit - 5 Days</div>
+                                <div style="margin-top: 8px;">
+                                    <button class="btn btn-primary" style="font-size: 11px; padding: 4px 8px;">Approve</button>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="action-item">
+                            <div class="action-icon">🏥</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px;">Priya Das (Cls 7)</div>
+                                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Sick Bay Admission</div>
+                                <div style="margin-top: 8px;">
+                                    <button class="btn btn-primary" style="font-size: 11px; padding: 4px 8px;">Approve</button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <button class="btn btn-outline" style="width: 100%; margin-top: 16px;">View All Requests</button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+</html>
